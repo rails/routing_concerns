@@ -44,7 +44,6 @@ BCX::Application.routes.draw do
       post :trash, :restore, on: :member
     end
   
-    get 'todolists/:todolist_id/todos/completed', to: 'todos#completed', as: 'todolist_completed_todos'
     resources :todos do
       post :toggle, :trash, :restore, on: :member
     end
