@@ -1,4 +1,5 @@
-= Routing Concerns
+Routing Concerns
+================
 
 Abstract common routing resource concerns to cut down on duplication.
 
@@ -96,6 +97,7 @@ BCX::Application.routes.draw do
 end
 ```
 
-== Compatibility
+Compatibility
+-------------
 
 This plugin was designed as a proof-of-concept for a feature that's destined for Rails 4. It has only been tested on Rails 3.2+, but may work on earlier versions as well.
