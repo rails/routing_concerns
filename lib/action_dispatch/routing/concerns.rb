@@ -5,7 +5,7 @@ module ActionDispatch::Routing::Mapper::Concerns
     @concerns ||= {}
     @concerns[name] = block
   end
-  
+
   def concerns(*names)
     Array(names).flatten.compact.each do |name|
       if @concerns && concern = @concerns[name]
@@ -19,12 +19,12 @@ end
 
 module ActionDispatch::Routing::Mapper::ResourcesWithConcerns
   extend ActiveSupport::Concern
-  
+
   included do
     alias_method_chain :resource,  :concerns
     alias_method_chain :resources, :concerns
   end
-  
+
   def resource_with_concerns(*resources, &block)
     if (options_with_concerns = resources.last).is_a?(Hash)
       named_concerns = options_with_concerns[:concerns]
