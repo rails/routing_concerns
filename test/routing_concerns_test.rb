@@ -15,15 +15,28 @@ class CommentsController < ActionController::Base
   end
 end
 
+class FlagsController < ActionController::Base
+  def index
+    head :ok
+  end
+end
+
 class RoutingConcernsTest < ActionDispatch::IntegrationTest
   Routes = ActionDispatch::Routing::RouteSet.new.tap do |app|
     app.draw do
       concern :commentable do
         resources :comments
       end
-      
-      resources :posts, concerns: :commentable
-      resource  :post,  concerns: :commentable
+
+      concern :flaggable do |options|
+        resources :flags, options
+      end
+
+      resources :posts, concerns: :commentable do
+        concerns :flaggable, only: :index
+      end
+
+      resource  :post, concerns: :commentable
       resources :comments
     end
   end
@@ -39,5 +52,15 @@ class RoutingConcernsTest < ActionDispatch::IntegrationTest
   test "accessing concern from resource" do
     get "/post/comments"
     assert_equal "200", @response.code
+  end
+
+  test "accessing another concern from resources" do
+    get "/posts/1/flags"
+    assert_equal "200", @response.code
+  end
+
+  test "passing options to concern" do
+    post "/posts/1/flags"
+    assert_equal "404", @response.code
   end
 end
