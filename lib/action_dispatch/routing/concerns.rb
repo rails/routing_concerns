@@ -2,15 +2,17 @@ require 'action_dispatch'
 require 'active_support/core_ext/module/aliasing'
 
 module ActionDispatch::Routing::Mapper::Concerns
-  def concern(name, &block)
+  def concern(name, callable = nil, &block)
+    callable ||= lambda { |mapper, options| mapper.instance_exec(options, &block) }
     @concerns ||= {}
-    @concerns[name] = block
+    @concerns[name] = callable
   end
 
-  def concerns(*names)
-    Array(names).flatten.compact.each do |name|
+  def concerns(*args)
+    options = args.extract_options!
+    Array(args).flatten.compact.each do |name|
       if @concerns && concern = @concerns[name]
-        instance_eval(&concern)
+        concern.call(self, options)
       else
         raise "No concern named #{name} was found!"
       end
