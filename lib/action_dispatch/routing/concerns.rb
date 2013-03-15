@@ -53,5 +53,27 @@ module ActionDispatch::Routing::Mapper::ResourcesWithConcerns
   end
 end
 
+module ActionDispatch::Routing::Mapper::ScopesWithConcerns
+  extend ActiveSupport::Concern
+
+  included do
+    alias_method_chain :scope, :concerns
+  end
+
+  def scope_with_concerns(*scopes, &block)
+    if (options_with_concerns = scopes.last).is_a?(Hash)
+      named_concerns = options_with_concerns.delete(:concerns)
+
+      scope_without_concerns(*scopes) do
+        concerns(named_concerns)
+        block.call if block_given?
+      end
+    else
+      scope_without_concerns(*scopes, &block)
+    end
+  end
+end
+
 ActionDispatch::Routing::Mapper.send :include, ActionDispatch::Routing::Mapper::Concerns
 ActionDispatch::Routing::Mapper.send :include, ActionDispatch::Routing::Mapper::ResourcesWithConcerns
+ActionDispatch::Routing::Mapper.send :include, ActionDispatch::Routing::Mapper::ScopesWithConcerns

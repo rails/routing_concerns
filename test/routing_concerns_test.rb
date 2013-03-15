@@ -15,6 +15,11 @@ class CommentsController < ActionController::Base
   end
 end
 
+module Namespaced
+  class CommentsController < CommentsController
+  end
+end
+
 class RoutingConcernsTest < ActionDispatch::IntegrationTest
   Routes = ActionDispatch::Routing::RouteSet.new.tap do |app|
     app.draw do
@@ -25,6 +30,10 @@ class RoutingConcernsTest < ActionDispatch::IntegrationTest
       resources :posts, concerns: :commentable
       resource  :post,  concerns: :commentable
       resources :comments
+
+      scope 'scoped', concerns: :commentable do end
+
+      namespace 'namespaced', concerns: :commentable do end
     end
   end
 
@@ -38,6 +47,16 @@ class RoutingConcernsTest < ActionDispatch::IntegrationTest
 
   test "accessing concern from resource" do
     get "/post/comments"
+    assert_equal "200", @response.code
+  end
+
+  test "accessing concern from scope" do
+    get "/scoped/comments"
+    assert_equal "200", @response.code
+  end
+
+  test "accessing concern from namespace" do
+    get "/namespaced/comments"
     assert_equal "200", @response.code
   end
 end
